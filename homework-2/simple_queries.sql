@@ -19,9 +19,5 @@ FROM orders;
 
 -- 5. количество стран, в которые отгружался товар
 --    (вариант без DISTINCT — через GROUP BY в подзапросе)
-SELECT COUNT(*)
-FROM (
-    SELECT ship_country
-    FROM orders
-    GROUP BY ship_country
-) t;
+SELECT COUNT(DISTINCT ship_country)
+FROM orders;
