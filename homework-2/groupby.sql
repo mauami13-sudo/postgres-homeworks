@@ -1,20 +1,51 @@
--- Напишите запросы, которые выводят следующую информацию:
--- 1. заказы, отправленные в города, заканчивающиеся на 'burg'. Вывести без повторений две колонки (город, страна) (см. таблица orders, колонки ship_city, ship_country)
+-- 1. Заказы, отправленные в города, заканчивающиеся на 'burg'.
+--    Без повторений: город, страна
+SELECT DISTINCT ship_city, ship_country
+FROM orders
+WHERE ship_city LIKE '%burg';
 
+-- 2. order_id, customer_id, freight, ship_country.
+--    Отгружено в страны, начинающиеся на 'P'.
+--    Сортировка по весу по убыванию, первые 10 записей.
+SELECT order_id, customer_id, freight, ship_country
+FROM orders
+WHERE ship_country LIKE 'P%'
+ORDER BY freight DESC
+LIMIT 10;
 
--- 2. из таблицы orders идентификатор заказа, идентификатор заказчика, вес и страну отгрузки. Заказ отгружен в страны, начинающиеся на 'P'. Результат отсортирован по весу (по убыванию). Вывести первые 10 записей.
+-- 3. Имя, фамилия и телефон сотрудников, у которых отсутствует регион
+SELECT first_name, last_name, home_phone
+FROM employees
+WHERE region IS NULL;
 
+-- 4. Количество поставщиков в каждой стране.
+--    По убыванию количества.
+SELECT country, COUNT(*)
+FROM suppliers
+GROUP BY country
+ORDER BY COUNT(*) DESC;
 
--- 3. имя, фамилию и телефон сотрудников, у которых в данных отсутствует регион (см таблицу employees)
+-- 5. Суммарный вес заказов (где известен регион) по странам,
+--    только страны с суммарным весом > 2750.
+--    По убыванию суммарного веса.
+SELECT ship_country, SUM(freight)
+FROM orders
+WHERE ship_region IS NOT NULL
+GROUP BY ship_country
+HAVING SUM(freight) > 2750
+ORDER BY SUM(freight) DESC;
 
+-- 6. Страны, в которых зарегистрированы и заказчики, и поставщики, и работники
+SELECT country FROM customers
+INTERSECT
+SELECT country FROM suppliers
+INTERSECT
+SELECT country FROM employees;
 
--- 4. количество поставщиков (suppliers) в каждой из стран. Результат отсортировать по убыванию количества поставщиков в стране
-
-
--- 5. суммарный вес заказов (в которых известен регион) по странам, но вывести только те результаты, где суммарный вес на страну больше 2750. Отсортировать по убыванию суммарного веса (см таблицу orders, колонки ship_region, ship_country, freight)
-
-
--- 6. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers) и работники (employees).
-
-
--- 7. страны, в которых зарегистрированы и заказчики (customers) и поставщики (suppliers), но не зарегистрированы работники (employees).
+-- 7. Страны, в которых зарегистрированы и заказчики, и поставщики,
+--    но НЕ зарегистрированы работники
+(SELECT country FROM customers
+ INTERSECT
+ SELECT country FROM suppliers)
+EXCEPT
+SELECT country FROM employees;
