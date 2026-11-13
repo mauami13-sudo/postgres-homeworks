@@ -14,7 +14,6 @@ SELECT *
 FROM products
 WHERE discontinued = 1;
 
--- (опционально) сделать таблицу полноценной — добавить PK
 ALTER TABLE discontinued_products
     ADD CONSTRAINT pk_discontinued_products PRIMARY KEY (product_id);
 
